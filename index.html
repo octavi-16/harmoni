@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Harmoni - Aplikasi Musik Multipage</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                            900: '#164e63',
+                        },
+                        dark: {
+                            base: '#09090b',
+                            card: '#18181b',
+                            hover: '#27272a',
+                            border: '#3f3f46'
+                        }
+                    },
+                    animation: {
+                        'spin-slow': 'spin 12s linear infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #09090b;
+            color: #f4f4f5;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #09090b;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3f3f46;
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #06b6d4;
+        }
+        /* Glassmorphism utility */
+        .glass {
+            background: rgba(24, 24, 27, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col justify-between select-none">
+
+    <!-- App Container -->
+    <div class="flex flex-1 h-0 overflow-hidden relative">
+        
+        <!-- SIDEBAR: Desktop Sidebar Navigation -->
+        <aside class="hidden md:flex flex-col w-64 bg-dark-base border-r border-dark-border p-5 justify-between">
+            <div class="space-y-6">
+                <!-- Brand Logo -->
+                <div class="flex items-center space-x-3 px-2">
+                    <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-400 to-indigo-600 flex items-center justify-center shadow-lg shadow-cyan-500/20">
+                        <i class="fas fa-wave-square text-white text-xl animate-pulse"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-extrabold text-xl tracking-tight bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">HARMONI</h1>
+                        <span class="text-[10px] text-zinc-500 font-semibold tracking-widest uppercase">Music App</span>
+                    </div>
+                </div>
+
+                <!-- Nav Links -->
+                <nav class="space-y-1">
+                    <button onclick="switchView('home')" id="nav-home" class="nav-btn w-full flex items-center space-x-4 px-4 py-3 rounded-xl transition duration-200 text-cyan-400 bg-dark-card font-medium">
+                        <i class="fas fa-home text-lg"></i>
+                        <span>Beranda</span>
+                    </button>
+                    <button onclick="switchView('search')" id="nav-search" class="nav-btn w-full flex items-center space-x-4 px-4 py-3 rounded-xl transition duration-200 text-zinc-400 hover:text-white hover:bg-dark-hover">
+                        <i class="fas fa-search text-lg"></i>
+                        <span>Cari</span>
+                    </button>
+                    <button onclick="switchView('library')" id="nav-library" class="nav-btn w-full flex items-center space-x-4 px-4 py-3 rounded-xl transition duration-200 text-zinc-400 hover:text-white hover:bg-dark-hover">
+                        <i class="fas fa-book-open text-lg"></i>
+                        <span>Koleksi Saya</span>
+                    </button>
+                    <button onclick="switchView('player')" id="nav-player" class="nav-btn w-full flex items-center space-x-4 px-4 py-3 rounded-xl transition duration-200 text-zinc-400 hover:text-white hover:bg-dark-hover">
+                        <i class="fas fa-headphones text-lg"></i>
+                        <span>Pemutar Musik</span>
+                    </button>
+                </nav>
+            </div>
+
+            <!-- Profile Info & Equalizer Display -->
+            <div class="space-y-4">
+                <div class="p-4 rounded-xl bg-dark-card border border-dark-border/40">
+                    <div class="flex items-center space-x-3 mb-2">
+                        <div class="relative">
+                            <img src="https://placehold.co/40x40/0891b2/ffffff?text=U" class="w-8 h-8 rounded-full border border-cyan-500" alt="User Avatar">
+                            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-dark-base rounded-full"></span>
+                        </div>
+                        <div>
+                            <p class="text-sm font-semibold text-zinc-200">Pendengar Setia</p>
+                            <span class="text-[10px] text-cyan-400">Harmoni Premium</span>
+                        </div>
+                    </div>
+                    <!-- Mini visualizer in sidebar -->
+                    <div class="flex items-end justify-between h-8 px-1 pt-2">
+                        <div class="v-bar w-1 bg-cyan-500 rounded-t h-1/4 animate-pulse"></div>
+                        <div class="v-bar w-1 bg-cyan-400 rounded-t h-2/4 animate-pulse"></div>
+                        <div class="v-bar w-1 bg-indigo-500 rounded-t h-3/4 animate-pulse"></div>
+                        <div class="v-bar w-1 bg-cyan-500 rounded-t h-1/2 animate-pulse"></div>
+                        <div class="v-bar w-1 bg-indigo-400 rounded-t h-full animate-pulse"></div>
+                        <div class="v-bar w-1 bg-cyan-400 rounded-t h-2/3 animate-pulse"></div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 flex flex-col h-full overflow-hidden relative">
+            
+            <!-- TOP HEADER (Dynamic search status/user options) -->
+            <header class="glass sticky top-0 z-40 flex items-center justify-between px-6 py-4 border-b border-dark-border/40">
+                <div class="flex items-center space-x-4">
+                    <!-- Nav buttons for history simulation -->
+                    <button class="w-8 h-8 rounded-full bg-dark-card flex items-center justify-center text-zinc-400 hover:text-white transition">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button class="w-8 h-8 rounded-full bg-dark-card flex items-center justify-center text-zinc-400 hover:text-white transition">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <h2 id="header-title" class="text-lg font-bold text-white hidden sm:block">Beranda</h2>
+                </div>
+                <!-- Quick Settings / Equalizer Toggle -->
+                <div class="flex items-center space-x-3">
+                    <button onclick="toggleEqualizerModal()" class="px-3 py-1.5 rounded-full bg-dark-card hover:bg-dark-hover text-zinc-300 hover:text-cyan-400 text-xs font-semibold flex items-center space-x-2 border border-dark-border/40 transition">
+                        <i class="fas fa-sliders-h"></i>
+                        <span>EQ & Efek</span>
+                    </button>
+                    <button onclick="toggleSleepTimerModal()" class="px-3 py-1.5 rounded-full bg-dark-card hover:bg-dark-hover text-zinc-300 hover:text-cyan-400 text-xs font-semibold flex items-center space-x-2 border border-dark-border/40 transition">
+                        <i class="fas fa-clock"></i>
+                        <span id="sleep-timer-display">Waktu Tidur</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- VIEW CONTAINER (Switchable views) -->
+            <div class="flex-1 overflow-y-auto px-6 py-6 pb-24" id="view-viewport">
+                
+                <!-- HOME VIEW -->
+                <section id="view-home" class="view-content space-y-8 animate-fade-in">
+                    <!-- Banner Promosi Premium -->
+                    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-cyan-900/80 via-indigo-950/80 to-zinc-950/80 border border-cyan-500/20 p-8 sm:p-10 shadow-2xl">
+                        <div class="absolute right-0 top-0 -mt-10 -mr-10 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl"></div>
+                        <div class="absolute left-1/3 bottom-0 -mb-20 w-80 h-80 bg-indigo-500/10 rounded-full blur-3xl"></div>
+                        <div class="relative z-10 max-w-lg space-y-4">
+                            <span class="px-3 py-1 rounded-full bg-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-wider">Premium Eksklusif</span>
+                            <h3 class="text-2xl sm:text-4xl font-extrabold text-white leading-tight">Rasakan Aliran Suara Murni Bersama Harmoni</h3>
+                            <p class="text-zinc-400 text-sm sm:text-base">Mulai mendengarkan album orisinal eksklusif dengan efek visualizer modern yang menyesuaikan ketukan lagu Anda.</p>
+                            <div class="flex flex-wrap gap-3 pt-2">
+                                <button onclick="playRandomTrack()" class="px-6 py-3 bg-gradient-to-r from-cyan-400 to-indigo-500 hover:from-cyan-300 hover:to-indigo-400 text-dark-base font-bold rounded-full shadow-lg transition transform hover:scale-105 active:scale-95 flex items-center space-x-2">
+                                    <i class="fas fa-random"></i>
+                                    <span>Putar Acak</span>
+                                </button>
+                                <button onclick="switchView('search')" class="px-6 py-3 bg-dark-card/60 hover:bg-dark-card text-white font-semibold rounded-full border border-dark-border/60 transition">
+                                    Cari Lagu
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recommended / Featured Songs Section -->
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-xl font-bold text-white tracking-tight">Rekomendasi Untukmu</h4>
+                            <span class="text-xs text-zinc-500 hover:text-cyan-400 cursor-pointer">Lihat Semua</span>
+                        </div>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4" id="recommended-grid">
+                            <!-- Dynamic recommendations will be injected here via JavaScript -->
+                        </div>
+                    </div>
+
+                    <!-- Genre Grid Section -->
+                    <div class="space-y-4">
+                        <h4 class="text-xl font-bold text-white tracking-tight">Pilih Berdasarkan Mood & Genre</h4>
+                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4" id="genre-grid">
+                            <!-- Populated in JS -->
+                        </div>
+                    </div>
+
+                    <!-- Playlists / Recently Played Section -->
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-xl font-bold text-white tracking-tight">Baru Saja Diputar</h4>
+                            <button onclick="clearRecentlyPlayed()" class="text-xs text-zinc-500 hover:text-red-400 transition">Hapus Riwayat</button>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="recently-played-grid">
+                            <!-- Injected dynamically -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- SEARCH VIEW -->
+                <section id="view-search" class="view-content hidden space-y-6 animate-fade-in">
+                    <!-- Modern Dynamic Search Bar -->
+                    <div class="relative w-full max-w-2xl mx-auto">
+                        <i class="fas fa-search absolute left-5 top-1/2 -translate-y-1/2 text-zinc-400 text-lg"></i>
+                        <input type="text" id="search-input" onkeyup="handleSearch(this.value)" placeholder="Cari lagu, artis, atau genre..." class="w-full bg-dark-card border border-dark-border/80 rounded-2xl pl-14 pr-12 py-4 text-white placeholder-zinc-500 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all text-base">
+                        <button onclick="clearSearch()" id="clear-search-btn" class="hidden absolute right-5 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white transition">
+                            <i class="fas fa-times-circle text-lg"></i>
+                        </button>
+                    </div>
+
+                    <!-- Search Filter / Badges -->
+                    <div class="flex flex-wrap gap-2 justify-center max-w-2xl mx-auto" id="search-tags">
+                        <button onclick="filterSearch('')" class="search-tag-btn px-4 py-2 rounded-full text-xs font-semibold bg-cyan-500 text-dark-base border border-cyan-400/20 transition">Semua</button>
+                        <button onclick="filterSearch('Pop')" class="search-tag-btn px-4 py-2 rounded-full text-xs font-semibold bg-dark-card text-zinc-400 hover:text-white border border-dark-border/40 transition">Pop</button>
+                        <button onclick="filterSearch('Folk')" class="search-tag-btn px-4 py-2 rounded-full text-xs font-semibold bg-dark-card text-zinc-400 hover:text-white border border-dark-border/40 transition">Folk & Akustik</button>
+                        <button onclick="filterSearch('Ambient')" class="search-tag-btn px-4 py-2 rounded-full text-xs font-semibold bg-dark-card text-zinc-400 hover:text-white border border-dark-border/40 transition">Ambient / Nature</button>
+                        <button onclick="filterSearch('Lofi')" class="search-tag-btn px-4 py-2 rounded-full text-xs font-semibold bg-dark-card text-zinc-400 hover:text-white border border-dark-border/40 transition">Lofi & Chill</button>
+                    </div>
+
+                    <!-- Search Results Title -->
+                    <div class="pt-4 max-w-4xl mx-auto">
+                        <h4 class="text-lg font-bold text-white mb-4" id="search-status-text">Semua Lagu Terkatalog</h4>
+                        
+                        <!-- Search results output -->
+                        <div class="space-y-2" id="search-results-list">
+                            <!-- Populated with search result cards dynamically -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- LIBRARY VIEW -->
+                <section id="view-library" class="view-content hidden space-y-6 animate-fade-in">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-dark-border/40 pb-4">
+                        <div>
+                            <h3 class="text-2xl font-bold text-white">Koleksi Musik Anda</h3>
+                            <p class="text-sm text-zinc-400">Atur lagu favorit dan buat playlist sesuai keinginan Anda.</p>
+                        </div>
+                        <button onclick="openCreatePlaylistDialog()" class="px-5 py-2.5 bg-cyan-500 hover:bg-cyan-400 text-dark-base font-bold rounded-xl text-sm flex items-center space-x-2 transition shadow-lg shadow-cyan-500/10">
+                            <i class="fas fa-plus"></i>
+                            <span>Buat Playlist Baru</span>
+                        </button>
+                    </div>
+
+                    <!-- Tabs inside Library -->
+                    <div class="flex space-x-4 border-b border-dark-border/40 pb-1">
+                        <button onclick="switchLibraryTab('favorites')" id="lib-tab-favorites" class="pb-3 px-1 text-sm font-semibold border-b-2 border-cyan-400 text-cyan-400 transition-all">Lagu Favorit</button>
+                        <button onclick="switchLibraryTab('playlists')" id="lib-tab-playlists" class="pb-3 px-1 text-sm font-semibold text-zinc-400 border-b-2 border-transparent hover:text-white transition-all">Playlist Saya</button>
+                    </div>
+
+                    <!-- Content for Favorites Tab -->
+                    <div id="library-favorites-panel" class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3" id="library-favorites-grid">
+                            <!-- Dynamically loaded songs that user favorited -->
+                        </div>
+                        <!-- Empty State Favorites -->
+                        <div id="empty-favorites-state" class="hidden text-center py-12 space-y-3">
+                            <div class="w-16 h-16 rounded-full bg-dark-card border border-dark-border flex items-center justify-center mx-auto text-zinc-500">
+                                <i class="fas fa-heart text-2xl"></i>
+                            </div>
+                            <p class="text-zinc-400 text-sm">Belum ada lagu favorit. Tekan tombol <i class="fas fa-heart text-red-500 mx-1"></i> pada pemutar untuk menyimpannya.</p>
+                        </div>
+                    </div>
+
+                    <!-- Content for Playlists Tab -->
+                    <div id="library-playlists-panel" class="hidden space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="library-playlists-grid">
+                            <!-- Custom user playlists -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- FULL PLAYER VIEW -->
+                <section id="view-player" class="view-content hidden flex flex-col items-center justify-center min-h-[70vh] max-w-4xl mx-auto space-y-8 animate-fade-in relative">
+                    <!-- Dynamic Glowing Background from current song image -->
+                    <div class="absolute inset-0 -z-10 rounded-3xl overflow-hidden opacity-10">
+                        <img id="player-bg-blur" src="https://placehold.co/600x600/18181b/ffffff?text=Harmoni" class="w-full h-full object-cover scale-150 blur-3xl" alt="Blur Background">
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full items-center">
+                        
+                        <!-- LEFT COMPONENT: Album Art with spin & visualizer canvas -->
+                        <div class="flex flex-col items-center justify-center space-y-6">
+                            <!-- Album vinyl design -->
+                            <div class="relative w-64 h-64 sm:w-80 sm:h-80 rounded-full border-4 border-zinc-800 shadow-2xl flex items-center justify-center group overflow-hidden">
+                                <!-- Spinning record plate background -->
+                                <div class="absolute inset-0 bg-[#0d0d0f] rounded-full border border-zinc-700/50 flex items-center justify-center">
+                                    <div class="w-[90%] h-[90%] rounded-full border border-zinc-800/80 flex items-center justify-center">
+                                        <div class="w-[80%] h-[80%] rounded-full border border-zinc-800 flex items-center justify-center"></div>
+                                    </div>
+                                </div>
+                                <!-- Spinning album art cover -->
+                                <img id="player-album-cover" src="https://placehold.co/400x400/0891b2/ffffff?text=Senandung+Senja" class="absolute w-[60%] h-[60%] rounded-full object-cover border-4 border-[#0d0d0f] shadow-inner animate-spin-slow duration-1000" style="animation-play-state: paused;" alt="Album Cover">
+                                <!-- Center hole decoration -->
+                                <div class="absolute w-6 h-6 bg-dark-base rounded-full border-2 border-zinc-700 z-10 flex items-center justify-center">
+                                    <div class="w-2 h-2 bg-zinc-900 rounded-full"></div>
+                                </div>
+                            </div>
+
+                            <!-- Lyrics / Visualizer Mode Toggle -->
+                            <div class="flex space-x-2 bg-dark-card border border-dark-border/60 p-1.5 rounded-full text-xs">
+                                <button onclick="togglePlayerWidget('visualizer')" id="widget-btn-visualizer" class="px-4 py-1.5 rounded-full bg-cyan-500 text-dark-base font-bold transition">Visualizer</button>
+                                <button onclick="togglePlayerWidget('lyrics')" id="widget-btn-lyrics" class="px-4 py-1.5 rounded-full text-zinc-400 hover:text-white transition">Lirik Lagu</button>
+                            </div>
+                        </div>
+
+                        <!-- RIGHT COMPONENT: Context Widgets (Interactive Canvas / Lyrics panel) -->
+                        <div class="w-full h-[320px] rounded-2xl bg-dark-card border border-dark-border/40 p-5 flex flex-col justify-between overflow-hidden relative shadow-lg">
+                            
+                            <!-- Visualizer Sub-panel -->
+                            <div id="player-visualizer-widget" class="w-full h-full flex flex-col justify-between">
+                                <div class="flex items-center justify-between border-b border-dark-border/40 pb-2">
+                                    <h5 class="text-xs font-bold text-zinc-400 tracking-wider uppercase">Visualisasi Spektrum</h5>
+                                    <!-- Visualizer Mode Pick -->
+                                    <select onchange="changeVisualizerStyle(this.value)" class="bg-dark-base border border-dark-border text-xs rounded px-2 py-1 text-zinc-300 focus:outline-none">
+                                        <option value="bars">Batang Spektrum</option>
+                                        <option value="sine">Gelombang Sinus</option>
+                                        <option value="pulse">Lingkaran Detak</option>
+                                    </select>
+                                </div>
+                                <div class="flex-1 w-full relative pt-4 overflow-hidden">
+                                    <canvas id="audio-visualizer-canvas" class="w-full h-full rounded-lg"></canvas>
+                                </div>
+                            </div>
+
+                            <!-- Lyrics Sub-panel -->
+                            <div id="player-lyrics-widget" class="hidden w-full h-full flex flex-col">
+                                <div class="flex items-center justify-between border-b border-dark-border/40 pb-2 mb-3">
+                                    <h5 class="text-xs font-bold text-zinc-400 tracking-wider uppercase">Lirik Berjalan</h5>
+                                    <span class="text-[10px] bg-cyan-950 text-cyan-400 font-bold px-2 py-0.5 rounded-full uppercase">Sinkron</span>
+                                </div>
+                                <div id="lyrics-container" class="flex-1 overflow-y-auto space-y-4 text-center px-2 py-4 scroll-smooth">
+                                    <!-- Populated with dynamic timestamps via JS -->
+                                    <p class="text-zinc-500 transition duration-300">Lirik tidak tersedia.</p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Song details and control bar on main screen -->
+                    <div class="w-full space-y-4 pt-4 border-t border-dark-border/20">
+                        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                            <div class="text-center sm:text-left">
+                                <h3 id="player-track-title" class="text-2xl font-bold text-white tracking-tight">Judul Lagu</h3>
+                                <p id="player-track-artist" class="text-cyan-400 font-medium">Nama Artis / Musisi</p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button onclick="toggleFavoriteCurrent()" id="player-favorite-btn" class="w-11 h-11 rounded-full bg-dark-card hover:bg-dark-hover border border-dark-border flex items-center justify-center text-zinc-300 transition">
+                                    <i class="far fa-heart text-lg"></i>
+                                </button>
+                                <button onclick="shareSong()" class="w-11 h-11 rounded-full bg-dark-card hover:bg-dark-hover border border-dark-border flex items-center justify-center text-zinc-300 transition">
+                                    <i class="fas fa-share-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Music Progress Bar -->
+                        <div class="space-y-1">
+                            <div class="flex justify-between text-xs text-zinc-500 font-medium">
+                                <span id="player-time-current">0:00</span>
+                                <span id="player-time-total">0:00</span>
+                            </div>
+                            <!-- Styled slider progress -->
+                            <div class="relative group h-1.5 bg-dark-border rounded-full cursor-pointer" id="progress-container" onclick="seekAudio(event)">
+                                <div id="progress-bar-fill" class="absolute left-0 top-0 h-full bg-gradient-to-r from-cyan-400 to-indigo-500 rounded-full w-0 transition-all duration-75"></div>
+                                <div id="progress-knob" class="absolute w-3.5 h-3.5 bg-white rounded-full border border-cyan-400 -top-1 shadow scale-0 group-hover:scale-100 transition-transform" style="left: 0%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Core Controls -->
+                        <div class="flex items-center justify-center space-x-6 sm:space-x-8">
+                            <button onclick="toggleShuffle()" id="player-shuffle" class="text-zinc-500 hover:text-white transition text-lg" title="Shuffle">
+                                <i class="fas fa-random"></i>
+                            </button>
+                            <button onclick="playPrev()" class="text-zinc-300 hover:text-cyan-400 transition text-2xl" title="Sebelumnya">
+                                <i class="fas fa-step-backward"></i>
+                            </button>
+                            <button onclick="togglePlay()" id="player-play-btn" class="w-16 h-16 rounded-full bg-cyan-500 hover:bg-cyan-400 text-dark-base flex items-center justify-center text-2xl transition transform active:scale-95 shadow-lg shadow-cyan-500/20" title="Putar / Jeda">
+                                <i class="fas fa-play ml-1"></i>
+                            </button>
+                            <button onclick="playNext()" class="text-zinc-300 hover:text-cyan-400 transition text-2xl" title="Berikutnya">
+                                <i class="fas fa-step-forward"></i>
+                            </button>
+                            <button onclick="toggleLoop()" id="player-loop" class="text-zinc-500 hover:text-white transition text-lg" title="Loop/Repeat">
+                                <i class="fas fa-redo"></i>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- MINI PLAYER BAR (At bottom of page, always visible unless in full screen view on mobile) -->
+            <section id="mini-player" class="glass border-t border-dark-border/40 fixed md:absolute bottom-16 md:bottom-0 left-0 right-0 h-20 px-4 flex items-center justify-between z-40">
+                <div class="flex items-center space-x-3 max-w-[50%] overflow-hidden cursor-pointer" onclick="switchView('player')">
+                    <img id="mini-album-cover" src="https://placehold.co/50x50/18181b/ffffff?text=Harmoni" class="w-12 h-12 rounded-lg object-cover border border-dark-border shadow" alt="Mini Art">
+                    <div class="overflow-hidden">
+                        <h4 id="mini-track-title" class="text-sm font-semibold text-white truncate">Pilih Lagu Anda</h4>
+                        <p id="mini-track-artist" class="text-xs text-zinc-400 truncate">Sistem Musik Harmoni</p>
+                    </div>
+                </div>
+
+                <!-- Mid-size buttons -->
+                <div class="flex items-center space-x-4">
+                    <button onclick="playPrev()" class="text-zinc-400 hover:text-white transition hidden sm:block">
+                        <i class="fas fa-step-backward text-sm"></i>
+                    </button>
+                    <button onclick="togglePlay()" id="mini-play-btn" class="w-10 h-10 rounded-full bg-cyan-500 hover:bg-cyan-400 text-dark-base flex items-center justify-center transition transform active:scale-95 shadow">
+                        <i class="fas fa-play ml-0.5"></i>
+                    </button>
+                    <button onclick="playNext()" class="text-zinc-400 hover:text-white transition">
+                        <i class="fas fa-step-forward text-sm"></i>
+                    </button>
+                    <button onclick="toggleFavoriteCurrent()" id="mini-favorite-btn" class="text-zinc-400 hover:text-red-500 transition hidden sm:block">
+                        <i class="far fa-heart"></i>
+                    </button>
+                </div>
+
+                <!-- Volume and Options (Desktop view only) -->
+                <div class="hidden md:flex items-center space-x-3 w-32">
+                    <button onclick="toggleMute()" id="volume-icon" class="text-zinc-400 hover:text-white transition">
+                        <i class="fas fa-volume-up"></i>
+                    </button>
+                    <input type="range" id="volume-slider" oninput="adjustVolume(this.value)" min="0" max="1" step="0.05" value="0.7" class="w-full accent-cyan-500 bg-dark-border rounded-lg h-1.5 cursor-pointer">
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- MOBILE BOTTOM NAVIGATION -->
+    <nav class="md:hidden glass border-t border-dark-border/40 fixed bottom-0 left-0 right-0 h-16 grid grid-cols-4 items-center justify-center text-center z-50">
+        <button onclick="switchView('home')" id="mob-nav-home" class="flex flex-col items-center justify-center text-cyan-400 transition">
+            <i class="fas fa-home text-lg"></i>
+            <span class="text-[10px] mt-0.5 font-medium">Beranda</span>
+        </button>
+        <button onclick="switchView('search')" id="mob-nav-search" class="flex flex-col items-center justify-center text-zinc-400 transition">
+            <i class="fas fa-search text-lg"></i>
+            <span class="text-[10px] mt-0.5 font-medium">Cari</span>
+        </button>
+        <button onclick="switchView('library')" id="mob-nav-library" class="flex flex-col items-center justify-center text-zinc-400 transition">
+            <i class="fas fa-book-open text-lg"></i>
+            <span class="text-[10px] mt-0.5 font-medium">Koleksi</span>
+        </button>
+        <button onclick="switchView('player')" id="mob-nav-player" class="flex flex-col items-center justify-center text-zinc-400 transition">
+            <i class="fas fa-headphones text-lg"></i>
+            <span class="text-[10px] mt-0.5 font-medium">Pemutar</span>
+        </button>
+    </nav>
+
+    <!-- EQUALIZER & SOUND MODAL -->
+    <div id="equalizer-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+        <div class="w-full max-w-md bg-dark-card border border-dark-border p-6 rounded-3xl space-y-6 animate-fade-in">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-sliders-h text-cyan-400 text-xl"></i>
+                    <h4 class="text-lg font-bold text-white">Equalizer & Audio FX</h4>
+                </div>
+                <button onclick="toggleEqualizerModal()" class="text-zinc-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <!-- EQ Preset Select -->
+            <div class="space-y-2">
+                <label class="text-xs text-zinc-400 font-semibold">Preset EQ Prasetel</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="applyEQPreset('normal')" class="eq-preset-btn px-3 py-2 text-xs font-semibold rounded-xl bg-cyan-500 text-dark-base border border-cyan-400/20 transition">Flat (Normal)</button>
+                    <button onclick="applyEQPreset('bass')" class="eq-preset-btn px-3 py-2 text-xs font-semibold rounded-xl bg-dark-base text-zinc-300 border border-dark-border transition">Bass Booster</button>
+                    <button onclick="applyEQPreset('vocal')" class="eq-preset-btn px-3 py-2 text-xs font-semibold rounded-xl bg-dark-base text-zinc-300 border border-dark-border transition">Vokal Jernih</button>
+                    <button onclick="applyEQPreset('chill')" class="eq-preset-btn px-3 py-2 text-xs font-semibold rounded-xl bg-dark-base text-zinc-300 border border-dark-border transition">Chill & Lo-fi</button>
+                </div>
+            </div>
+
+            <!-- Virtual Faders -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-zinc-400">Efek Reverb (Ruang Gema)</span>
+                    <span id="reverb-val" class="text-cyan-400 font-mono">Mati</span>
+                </div>
+                <input type="range" oninput="adjustReverb(this.value)" min="0" max="1" step="0.1" value="0" class="w-full accent-cyan-500 bg-dark-base rounded-lg h-1.5 cursor-pointer">
+                
+                <div class="flex justify-between items-center text-xs">
+                    <span class="text-zinc-400">Pemberi Tenaga Bass (Bass Boost)</span>
+                    <span id="bass-val" class="text-cyan-400 font-mono">0dB</span>
+                </div>
+                <input type="range" id="bass-boost-slider" oninput="adjustBass(this.value)" min="0" max="12" step="1" value="0" class="w-full accent-cyan-500 bg-dark-base rounded-lg h-1.5 cursor-pointer">
+            </div>
+
+            <div class="bg-dark-base/60 p-3 rounded-xl border border-dark-border/40 text-[11px] text-zinc-500 flex items-start space-x-2">
+                <i class="fas fa-info-circle text-cyan-500/80 mt-0.5"></i>
+                <p>Menggunakan Web Audio API waktu nyata (Real-time DSP) untuk memperkaya output audio Anda.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- SLEEP TIMER MODAL -->
+    <div id="sleep-timer-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+        <div class="w-full max-w-sm bg-dark-card border border-dark-border p-6 rounded-3xl space-y-6 animate-fade-in">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-clock text-cyan-400 text-xl"></i>
+                    <h4 class="text-lg font-bold text-white">Timer Mati Otomatis</h4>
+                </div>
+                <button onclick="toggleSleepTimerModal()" class="text-zinc-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <p class="text-xs text-zinc-400">Lagu akan berhenti diputar secara otomatis setelah jangka waktu berikut terpenuhi.</p>
+
+            <div class="grid grid-cols-2 gap-3" id="sleep-timer-grid">
+                <button onclick="setSleepTimer(0)" class="px-4 py-3 text-xs font-semibold rounded-xl bg-cyan-500 text-dark-base transition">Nonaktifkan</button>
+                <button onclick="setSleepTimer(5)" class="px-4 py-3 text-xs font-semibold rounded-xl bg-dark-base hover:bg-dark-hover text-zinc-300 transition border border-dark-border">5 Menit</button>
+                <button onclick="setSleepTimer(15)" class="px-4 py-3 text-xs font-semibold rounded-xl bg-dark-base hover:bg-dark-hover text-zinc-300 transition border border-dark-border">15 Menit</button>
+                <button onclick="setSleepTimer(30)" class="px-4 py-3 text-xs font-semibold rounded-xl bg-dark-base hover:bg-dark-hover text-zinc-300 transition border border-dark-border">30 Menit</button>
+                <button onclick="setSleepTimer(60)" class="px-4 py-3 text-xs font-semibold rounded-xl bg-dark-base hover:bg-dark-hover text-zinc-300 transition border border-dark-border">60 Menit</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOG: CREATE PLAYLIST -->
+    <div id="playlist-dialog" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+        <div class="w-full max-w-sm bg-dark-card border border-dark-border p-6 rounded-3xl space-y-4 animate-fade-in">
+            <h4 class="text-lg font-bold text-white">Nama Playlist Baru</h4>
+            <input type="text" id="playlist-name-input" placeholder="Tuliskan nama disini..." class="w-full bg-dark-base border border-dark-border rounded-xl px-4 py-3 text-white focus:outline-none focus:border-cyan-500">
+            <div class="flex space-x-2 pt-2 justify-end">
+                <button onclick="closeCreatePlaylistDialog()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition">Batal</button>
+                <button onclick="submitCreatePlaylist()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-cyan-500 hover:bg-cyan-400 text-dark-base font-bold transition">Buat</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOG: ADD TO PLAYLIST -->
+    <div id="add-to-playlist-dialog" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm">
+        <div class="w-full max-w-sm bg-dark-card border border-dark-border p-6 rounded-3xl space-y-4 animate-fade-in">
+            <h4 class="text-lg font-bold text-white">Tambahkan Ke Playlist</h4>
+            <div class="space-y-2 max-h-48 overflow-y-auto" id="target-playlists-list">
+                <!-- User Playlists will be loaded here -->
+            </div>
+            <div class="flex justify-end pt-2">
+                <button onclick="closeAddToPlaylistDialog()" class="px-4 py-2 text-xs font-semibold rounded-lg bg-zinc-800 text-zinc-300 hover:bg-zinc-700">Tutup</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION POPUP (In-app replacement for alerts) -->
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] transform -translate-y-10 opacity-0 pointer-events-none transition-all duration-300 bg-cyan-500 text-dark-base px-6 py-3 rounded-full text-xs font-bold shadow-2xl flex items-center space-x-2">
+        <i class="fas fa-info-circle"></i>
+        <span id="toast-text">Notifikasi muncul disini</span>
+    </div>
+
+    <!-- AUDIO HTML ELEMENT -->
+    <audio id="audio-engine" crossorigin="anonymous" class="hidden"></audio>
+
+    <script>
+        // High quality copyleft royalty free music links with descriptive Indonesian titles and simulated synced lyrics
+        const MUSIC_DATABASE = [
+            {
+                id: "track_1",
+                title: "Senandung Senja",
+                artist: "Swara Nusantara",
+                genre: "Folk",
+                cover: "https://placehold.co/400x400/0891b2/ffffff?text=Senandung+Senja",
+                audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+                duration: "6:12",
+                lyrics: [
+                    { time: 0, text: "[Musik Akustik Pembuka]" },
+                    { time: 10, text: "Senja tiba menyapa buana..." },
+                    { time: 20, text: "Membawa kedamaian yang mendalam di jiwa..." },
+                    { time: 30, text: "Mari bernyanyi mengikuti hembusan angin malam..." },
+                    { time: 42, text: "Harmoni alam mengiringi setiap petualangan kita..." },
+                    { time: 55, text: "[Interlude Gitar Akustik Indah]" }
+                ]
+            },
+            {
+                id: "track_2",
+                title: "Gema Nusantara",
+                artist: "Lana Dewantara",
+                genre: "Ambient",
+                cover: "https://placehold.co/400x400/4f46e5/ffffff?text=Gema+Nusantara",
+                audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3",
+                duration: "7:05",
+                lyrics: [
+                    { time: 0, text: "[Efek Alam & Angin Berhembus]" },
+                    { time: 12, text: "Gemuruh ombak dan gema nyanyian alam liar..." },
+                    { time: 28, text: "Kita menyatu di dalam frekuensi kesadaran tinggi..." },
+                    { time: 44, text: "Malam membawa ketenangan abadi bagi pejuang mimpi..." },
+                    { time: 59, text: "[Visualizer Melodi Sitar]" }
+                ]
+            },
+            {
+                id: "track_3",
+                title: "Rintik Hujan",
+                artist: "Syahdu Lofi",
+                genre: "Lofi",
+                cover: "https://placehold.co/400x400/db2777/ffffff?text=Rintik+Hujan",
+                audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3",
+                duration: "5:44",
+                lyrics: [
+                    { time: 0, text: "[Suara Hujan Lofi Rileks]" },
+                    { time: 15, text: "Secangkir kopi hangat menemani sepi..." },
+                    { time: 30, text: "Biarkan detak jam berlalu tanpa beban emosi..." },
+                    { time: 45, text: "Musik meredam kecemasan di kepala..." },
+                    { time: 60, text: "Rebahkan badan dan temukan kedamaian batin..." }
+                ]
+            },
+            {
+                id: "track_4",
+                title: "Langkah Baru",
+                artist: "Project Neon",
+                genre: "Pop",
+                cover: "https://placehold.co/400x400/059669/ffffff?text=Langkah+Baru",
+                audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3",
+                duration: "5:02",
+                lyrics: [
+                    { time: 0, text: "[Ketukan Drum Elektronik Pop Upbeat]" },
+                    { time: 8, text: "Saat mentari bersinar lebih silau..." },
+                    { time: 18, text: "Lupakan duka lalu mari kita berlayar!" },
+                    { time: 28, text: "Tak ada rintangan yang sanggup menghentikan tekad kita..." },
+                    { time: 38, text: "Melangkah maju menuju hari esok bersinar!" }
+                ]
+            },
+            {
+                id: "track_5",
+                title: "Lembayung Malam",
+                artist: "Vera & Svara",
+                genre: "Pop",
+                cover: "https://placehold.co/400x400/d97706/ffffff?text=Lembayung+Malam",
+                audioSrc: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3",
+                duration: "6:03",
+                lyrics: [
+                    { time: 0, text: "[Aura Melodi Tenang Intro]" },
+                    { time: 14, text: "Bintang-bintang bersinar bagaikan saksi..." },
+                    { time: 29, text: "Lagu romantis mengalir perlahan di malam kelabu..." },
+                    { time: 45, text: "Cinta takkan sirna meskipun jarak merentang luas..." }
+                ]
+            }
+        ];
+
+        // Core Web Player State Management
+        let appState = {
+            currentView: 'home',
+            currentTrackIndex: 0,
+            isPlaying: false,
+            volume: 0.7,
+            isMuted: false,
+            isShuffle: false,
+            isLoop: false,
+            favorites: ['track_1', 'track_3'], // Pre-favorited songs
+            recentlyPlayed: [],
+            playlists: [
+                { id: "p1", name: "Santai Pagi", tracks: ["track_1", "track_3"] },
+                { id: "p2", name: "Fokus & Kerja", tracks: ["track_2"] }
+            ],
+            audioCtxCreated: false,
+            activeVisualizerStyle: 'bars'
+        };
+
+        // DOM elements cache
+        const audioElement = document.getElementById('audio-engine');
+        const viewViewport = document.getElementById('view-viewport');
+        const viewHome = document.getElementById('view-home');
+        const viewSearch = document.getElementById('view-search');
+        const viewLibrary = document.getElementById('view-library');
+        const viewPlayer = document.getElementById('view-player');
+
+        // Web Audio API Nodes
+        let audioCtx, audioSource, analyser, equalizerFilter, bassBoostFilter;
+        let sleepTimerId = null;
+        let sleepTimerMinutesRemaining = 0;
+
+        window.onload = function() {
+            // Populate initial UI
+            renderHomeRecommendations();
+            renderRecentlyPlayed();
+            renderAllSearchTracks();
+            renderLibrary();
+            
+            // Set first track to player UI
+            setTrackToPlayer(0, false);
+            
+            // Register audio events
+            audioElement.addEventListener('timeupdate', handleTimeUpdate);
+            audioElement.addEventListener('ended', handleAudioEnded);
+            audioElement.addEventListener('loadedmetadata', () => {
+                document.getElementById('player-time-total').innerText = formatTime(audioElement.duration);
+            });
+
+            // Auto-resize visualizer canvas
+            window.addEventListener('resize', resizeVisualizerCanvas);
+            
+            showToast("Selamat datang di Harmoni Premium!");
+        }
+
+        function switchView(viewName) {
+            appState.currentView = viewName;
+            
+            // Hide all views
+            viewHome.classList.add('hidden');
+            viewSearch.classList.add('hidden');
+            viewLibrary.classList.add('hidden');
+            viewPlayer.classList.add('hidden');
+
+            // Show target view
+            document.getElementById(`view-${viewName}`).classList.remove('hidden');
+
+            // Reset navigation active styling
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.className = "nav-btn w-full flex items-center space-x-4 px-4 py-3 rounded-xl transition duration-200 text-zinc-400 hover:text-white hover:bg-dark-hover";
+            });
+            document.querySelectorAll('nav button').forEach(btn => {
+                if (btn.id === `nav-${viewName}`) {
+                    btn.className = "nav-btn w-full flex items-center space-x-4 px-4 py-3 rounded-xl transition duration-200 text-cyan-400 bg-dark-card font-medium";
+                }
+            });
+
+            // Mobile Nav Active styling
+            document.querySelectorAll('nav.md\\:hidden button').forEach(btn => {
+                btn.className = "flex flex-col items-center justify-center text-zinc-400 transition";
+                if (btn.id === `mob-nav-${viewName}`) {
+                    btn.className = "flex flex-col items-center justify-center text-cyan-400 transition";
+                }
+            });
+
+            // Update header text
+            const titleMap = {
+                'home': 'Beranda',
+                'search': 'Cari Musik',
+                'library': 'Koleksi Saya',
+                'player': 'Sedang Diputar'
+            };
+            document.getElementById('header-title').innerText = titleMap[viewName] || 'Harmoni';
+
+            // Resize canvas if player view is opened
+            if (viewName === 'player') {
+                setTimeout(resizeVisualizerCanvas, 100);
+            }
+        }
+
+        // Bulletproof dynamic synth generator so music always plays
+        let synthOscillator = null;
+        let isUsingProceduralAudio = false;
+
+        function playProceduralMusic() {
+            if (!appState.audioCtxCreated) initWebAudioAPI();
+            showToast("Beralih ke procedural synth audio...");
+            
+            // Stop native audio engine if playing
+            audioElement.pause();
+            
+            if (synthOscillator) synthOscillator.stop();
+
+            isUsingProceduralAudio = true;
+            generateSynthBeat();
+        }
+
+        function generateSynthBeat() {
+            if (!isUsingProceduralAudio) return;
+
+            const notes = [261.63, 293.66, 329.63, 349.23, 392.00, 440.00]; // Pentatonic scale C4-A4
+            let randomNote = notes[Math.floor(Math.random() * notes.length)];
+
+            synthOscillator = audioCtx.createOscillator();
+            let gainNode = audioCtx.createGain();
+
+            synthOscillator.type = 'sawtooth';
+            synthOscillator.frequency.value = randomNote;
+            
+            gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+            // Decay
+            gainNode.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
+
+            // Connect to visualizer
+            synthOscillator.connect(gainNode);
+            gainNode.connect(analyser);
+
+            synthOscillator.start();
+            
+            // Loop beat
+            setTimeout(() => {
+                if (appState.isPlaying && isUsingProceduralAudio) {
+                    generateSynthBeat();
+                }
+            }, 1000);
+        }
+
+        function initWebAudioAPI() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                audioCtx = new AudioContext();
+                
+                analyser = audioCtx.createAnalyser();
+                analyser.fftSize = 256;
+
+                // Create filters for real equalizer implementation
+                equalizerFilter = audioCtx.createBiquadFilter();
+                equalizerFilter.type = 'peaking';
+                equalizerFilter.frequency.value = 1000;
+                equalizerFilter.Q.value = 1;
+                equalizerFilter.gain.value = 0;
+
+                bassBoostFilter = audioCtx.createBiquadFilter();
+                bassBoostFilter.type = 'lowshelf';
+                bassBoostFilter.frequency.value = 150;
+                bassBoostFilter.gain.value = 0;
+
+                // Create Media Element Source
+                audioSource = audioCtx.createMediaElementSource(audioElement);
+                
+                // Route source -> Bass Boost Filter -> EQ Filter -> Analyser -> Output
+                audioSource.connect(bassBoostFilter);
+                bassBoostFilter.connect(equalizerFilter);
+                equalizerFilter.connect(analyser);
+                analyser.connect(audioCtx.destination);
+
+                appState.audioCtxCreated = true;
+                
+                // Start drawing visualizer animation frame
+                drawVisualizer();
+            } catch (err) {
+                console.warn("Web Audio API not supported fully in this environment.", err);
+            }
+        }
+
+        const canvas = document.getElementById('audio-visualizer-canvas');
+        const ctx = canvas.getContext('2d');
+
+        function resizeVisualizerCanvas() {
+            const container = canvas.parentElement;
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+
+        function drawVisualizer() {
+            requestAnimationFrame(drawVisualizer);
+            if (!analyser) return;
+
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            
+            analyser.getByteFrequencyData(dataArray);
+            
+            const width = canvas.width;
+            const height = canvas.height;
+            ctx.clearRect(0, 0, width, height);
+
+            if (appState.activeVisualizerStyle === 'bars') {
+                // Drawing traditional frequency bar spectrum
+                const barWidth = (width / bufferLength) * 1.5;
+                let barHeight;
+                let x = 0;
+
+                for (let i = 0; i < bufferLength; i++) {
+                    barHeight = dataArray[i] / 1.5;
+
+                    const percent = i / bufferLength;
+                    const r = 6 + percent * (8 - 6);
+                    const g = 182 + percent * (145 - 182);
+                    const b = 212 + percent * (178 - 212);
+
+                    ctx.fillStyle = `rgb(${r}, ${g}, ${b})`;
+                    ctx.fillRect(x, height - barHeight, barWidth - 1, barHeight);
+
+                    x += barWidth;
+                }
+            } else if (appState.activeVisualizerStyle === 'sine') {
+                // Drawing time domain sine wave
+                analyser.getByteTimeDomainData(dataArray);
+                ctx.lineWidth = 3;
+                ctx.strokeStyle = '#06b6d4';
+                ctx.beginPath();
+
+                const sliceWidth = width * 1.0 / bufferLength;
+                let x = 0;
+
+                for (let i = 0; i < bufferLength; i++) {
+                    const v = dataArray[i] / 128.0;
+                    const y = v * height / 2;
+
+                    if (i === 0) {
+                        ctx.moveTo(x, y);
+                    } else {
+                        ctx.lineTo(x, y);
+                    }
+
+                    x += sliceWidth;
+                }
+
+                ctx.lineTo(width, height / 2);
+                ctx.stroke();
+            } else if (appState.activeVisualizerStyle === 'pulse') {
+                // Drawing central pulsing circle beat
+                let totalEnergy = 0;
+                for (let i = 0; i < bufferLength; i++) {
+                    totalEnergy += dataArray[i];
+                }
+                const averageEnergy = totalEnergy / bufferLength;
+                const dynamicRadius = Math.min(width, height) / 4 + (averageEnergy / 3);
+
+                ctx.beginPath();
+                ctx.arc(width / 2, height / 2, dynamicRadius, 0, 2 * Math.PI);
+                const gradient = ctx.createRadialGradient(width / 2, height / 2, dynamicRadius / 2, width / 2, height / 2, dynamicRadius);
+                gradient.addColorStop(0, 'rgba(6, 182, 212, 0.1)');
+                gradient.addColorStop(0.8, 'rgba(6, 182, 212, 0.4)');
+                gradient.addColorStop(1, 'rgba(79, 70, 229, 0.8)');
+                
+                ctx.fillStyle = gradient;
+                ctx.fill();
+                ctx.strokeStyle = '#06b6d4';
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
+            }
+        }
+
+        function changeVisualizerStyle(styleName) {
+            appState.activeVisualizerStyle = styleName;
+        }
+
+        function setTrackToPlayer(index, shouldPlay = true) {
+            appState.currentTrackIndex = index;
+            const track = MUSIC_DATABASE[index];
+
+            // Setup audio source
+            audioElement.src = track.audioSrc;
+            
+            // Setup Full Player UI
+            document.getElementById('player-track-title').innerText = track.title;
+            document.getElementById('player-track-artist').innerText = track.artist;
+            document.getElementById('player-album-cover').src = track.cover;
+            document.getElementById('player-bg-blur').src = track.cover;
+
+            // Setup Mini Player UI
+            document.getElementById('mini-track-title').innerText = track.title;
+            document.getElementById('mini-track-artist').innerText = track.artist;
+            document.getElementById('mini-album-cover').src = track.cover;
+
+            // Render Favorite button icon states
+            updateFavoriteButtonUI();
+
+            // Load Synced Lyrics
+            renderLyrics(track.lyrics);
+
+            // Record history
+            addToHistory(track.id);
+
+            if (shouldPlay) {
+                // Safely attempt play to handle Chrome's autoplay policy
+                const playPromise = audioElement.play();
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        appState.isPlaying = true;
+                        updatePlayStates(true);
+                        if (!appState.audioCtxCreated) initWebAudioAPI();
+                    }).catch(err => {
+                        console.log("Autoplay block. Waiting for user interaction.", err);
+                        // Fallback synth
+                        appState.isPlaying = false;
+                        updatePlayStates(false);
+                    });
+                }
+            } else {
+                appState.isPlaying = false;
+                updatePlayStates(false);
+            }
+        }
+
+        function updatePlayStates(isPlaying) {
+            const mainPlayBtn = document.getElementById('player-play-btn');
+            const miniPlayBtn = document.getElementById('mini-play-btn');
+            const spinningRecord = document.getElementById('player-album-cover');
+
+            if (isPlaying) {
+                mainPlayBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                miniPlayBtn.innerHTML = '<i class="fas fa-pause text-xs"></i>';
+                spinningRecord.style.animationPlayState = 'running';
+            } else {
+                mainPlayBtn.innerHTML = '<i class="fas fa-play ml-1"></i>';
+                miniPlayBtn.innerHTML = '<i class="fas fa-play ml-0.5"></i>';
+                spinningRecord.style.animationPlayState = 'paused';
+            }
+        }
+
+        function togglePlay() {
+            if (!appState.audioCtxCreated) initWebAudioAPI();
+
+            if (appState.isPlaying) {
+                audioElement.pause();
+                appState.isPlaying = false;
+                if (isUsingProceduralAudio) {
+                    isUsingProceduralAudio = false;
+                    if (synthOscillator) synthOscillator.stop();
+                }
+            } else {
+                audioElement.play().then(() => {
+                    appState.isPlaying = true;
+                    isUsingProceduralAudio = false;
+                }).catch(err => {
+                    // Start synthesis fallback immediately if standard audio blocked or offline
+                    appState.isPlaying = true;
+                    playProceduralMusic();
+                });
+            }
+            updatePlayStates(appState.isPlaying);
+        }
+
+        function playNext() {
+            if (appState.isShuffle) {
+                let randIndex = Math.floor(Math.random() * MUSIC_DATABASE.length);
+                setTrackToPlayer(randIndex);
+            } else {
+                let nextIndex = (appState.currentTrackIndex + 1) % MUSIC_DATABASE.length;
+                setTrackToPlayer(nextIndex);
+            }
+        }
+
+        function playPrev() {
+            let prevIndex = (appState.currentTrackIndex - 1 + MUSIC_DATABASE.length) % MUSIC_DATABASE.length;
+            setTrackToPlayer(prevIndex);
+        }
+
+        function toggleShuffle() {
+            appState.isShuffle = !appState.isShuffle;
+            const btn = document.getElementById('player-shuffle');
+            if (appState.isShuffle) {
+                btn.className = "text-cyan-400 hover:text-cyan-300 transition text-lg";
+                showToast("Pengacakan lagu aktif");
+            } else {
+                btn.className = "text-zinc-500 hover:text-white transition text-lg";
+            }
+        }
+
+        function toggleLoop() {
+            appState.isLoop = !appState.isLoop;
+            const btn = document.getElementById('player-loop');
+            if (appState.isLoop) {
+                btn.className = "text-cyan-400 hover:text-cyan-300 transition text-lg";
+                showToast("Pengulangan satu lagu aktif");
+            } else {
+                btn.className = "text-zinc-500 hover:text-white transition text-lg";
+            }
+        }
+
+        function handleTimeUpdate() {
+            const current = audioElement.currentTime;
+            const duration = audioElement.duration || 1;
+            const percentage = (current / duration) * 100;
+
+            // Progress Fill Bar
+            document.getElementById('player-time-current').innerText = formatTime(current);
+            document.getElementById('progress-bar-fill').style.width = `${percentage}%`;
+            document.getElementById('progress-knob').style.left = `${percentage}%`;
+
+            // Active Sync Lyric Highlighting
+            highlightLyrics(current);
+        }
+
+        function handleAudioEnded() {
+            if (appState.isLoop) {
+                audioElement.currentTime = 0;
+                audioElement.play();
+            } else {
+                playNext();
+            }
+        }
+
+        function seekAudio(event) {
+            const container = document.getElementById('progress-container');
+            const rect = container.getBoundingClientRect();
+            const clickX = event.clientX - rect.left;
+            const width = rect.width;
+            const clickPercentage = clickX / width;
+            
+            audioElement.currentTime = clickPercentage * audioElement.duration;
+        }
+
+        function renderHomeRecommendations() {
+            const grid = document.getElementById('recommended-grid');
+            grid.innerHTML = '';
+
+            MUSIC_DATABASE.forEach((track, idx) => {
+                grid.innerHTML += `
+                    <div class="bg-dark-card border border-dark-border/40 p-4 rounded-2xl hover:bg-dark-hover hover:border-cyan-500/30 transition group cursor-pointer flex flex-col justify-between" onclick="setTrackToPlayer(${idx})">
+                        <div class="relative rounded-xl overflow-hidden mb-3 aspect-square shadow-md">
+                            <img src="${track.cover}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" alt="${track.title}">
+                            <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition duration-300 flex items-center justify-center">
+                                <span class="w-12 h-12 bg-cyan-500 text-dark-base rounded-full flex items-center justify-center text-lg shadow-lg transform translate-y-2 group-hover:translate-y-0 transition duration-300"><i class="fas fa-play ml-1"></i></span>
+                            </div>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-sm text-white truncate">${track.title}</h5>
+                            <p class="text-xs text-zinc-400 truncate mt-0.5">${track.artist}</p>
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-dark-border/20">
+                                <span class="text-[10px] uppercase font-bold text-cyan-400 bg-cyan-950 px-2 py-0.5 rounded">${track.genre}</span>
+                                <span class="text-xs text-zinc-500"><i class="far fa-clock mr-1"></i>${track.duration}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // Populate Genres list
+            const genres = ['Folk & Akustik', 'Ambient', 'Lofi Beats', 'Elektronik / Pop'];
+            const genreColors = [
+                'from-teal-600 to-cyan-800',
+                'from-indigo-600 to-indigo-900',
+                'from-rose-600 to-rose-900',
+                'from-emerald-600 to-cyan-900'
+            ];
+            const genreGrid = document.getElementById('genre-grid');
+            genreGrid.innerHTML = '';
+            
+            genres.forEach((genre, idx) => {
+                genreGrid.innerHTML += `
+                    <div onclick="filterSearch('${genre.split(' ')[0]}'); switchView('search')" class="bg-gradient-to-br ${genreColors[idx]} rounded-2xl p-4 h-24 flex flex-col justify-between shadow hover:opacity-90 transition cursor-pointer">
+                        <span class="text-sm font-extrabold text-white">${genre}</span>
+                        <div class="flex justify-end text-white/55"><i class="fas fa-music text-xl"></i></div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderAllSearchTracks() {
+            filterSearch('');
+        }
+
+        function handleSearch(query) {
+            const clearBtn = document.getElementById('clear-search-btn');
+            if (query.length > 0) {
+                clearBtn.classList.remove('hidden');
+            } else {
+                clearBtn.classList.add('hidden');
+            }
+            filterSearch(query);
+        }
+
+        function clearSearch() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('clear-search-btn').classList.add('hidden');
+            filterSearch('');
+        }
+
+        function filterSearch(term) {
+            const listContainer = document.getElementById('search-results-list');
+            const statusText = document.getElementById('search-status-text');
+            listContainer.innerHTML = '';
+
+            // Filter button active styling
+            document.querySelectorAll('.search-tag-btn').forEach(btn => {
+                btn.className = "search-tag-btn px-4 py-2 rounded-full text-xs font-semibold bg-dark-card text-zinc-400 hover:text-white border border-dark-border/40 transition";
+                if (term && btn.innerText.toLowerCase().includes(term.toLowerCase())) {
+                    btn.className = "search-tag-btn px-4 py-2 rounded-full text-xs font-semibold bg-cyan-500 text-dark-base border border-cyan-400/20 transition";
+                }
+            });
+
+            const filtered = MUSIC_DATABASE.filter(track => {
+                const searchStr = `${track.title} ${track.artist} ${track.genre}`.toLowerCase();
+                return searchStr.includes(term.toLowerCase());
+            });
+
+            if (filtered.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="text-center py-12 space-y-3">
+                        <i class="fas fa-search-minus text-zinc-500 text-3xl"></i>
+                        <p class="text-zinc-400 text-sm">Tidak ditemukan hasil pencarian untuk "${term}"</p>
+                    </div>
+                `;
+                statusText.innerText = `Pencarian untuk "${term}"`;
+                return;
+            }
+
+            statusText.innerText = term === '' ? 'Semua Lagu Terkatalog' : `Ditemukan ${filtered.length} hasil untuk "${term}"`;
+
+            filtered.forEach(track => {
+                const globalIndex = MUSIC_DATABASE.findIndex(t => t.id === track.id);
+                const isFavorited = appState.favorites.includes(track.id);
+
+                listContainer.innerHTML += `
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-dark-card hover:bg-dark-hover border border-dark-border/30 hover:border-cyan-500/20 transition">
+                        <div class="flex items-center space-x-3 cursor-pointer" onclick="setTrackToPlayer(${globalIndex})">
+                            <img src="${track.cover}" class="w-11 h-11 rounded-lg object-cover" alt="Art">
+                            <div>
+                                <h5 class="text-sm font-semibold text-white">${track.title}</h5>
+                                <p class="text-xs text-zinc-400">${track.artist} • <span class="text-cyan-500">${track.genre}</span></p>
+                            </div>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <span class="text-xs text-zinc-500 font-mono mr-2">${track.duration}</span>
+                            <button onclick="toggleFavorite('${track.id}')" class="w-8 h-8 rounded-full bg-dark-base hover:bg-dark-hover flex items-center justify-center text-zinc-400 hover:text-red-500 transition">
+                                <i class="${isFavorited ? 'fas text-red-500' : 'far'} fa-heart"></i>
+                            </button>
+                            <button onclick="openAddToPlaylistDialog('${track.id}')" class="w-8 h-8 rounded-full bg-dark-base hover:bg-dark-hover flex items-center justify-center text-zinc-400 hover:text-white transition">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function switchLibraryTab(tabName) {
+            const tabFavorites = document.getElementById('lib-tab-favorites');
+            const tabPlaylists = document.getElementById('lib-tab-playlists');
+            const panelFavorites = document.getElementById('library-favorites-panel');
+            const panelPlaylists = document.getElementById('library-playlists-panel');
+
+            if (tabName === 'favorites') {
+                tabFavorites.className = "pb-3 px-1 text-sm font-semibold border-b-2 border-cyan-400 text-cyan-400 transition-all";
+                tabPlaylists.className = "pb-3 px-1 text-sm font-semibold text-zinc-400 border-b-2 border-transparent hover:text-white transition-all";
+                panelFavorites.classList.remove('hidden');
+                panelPlaylists.classList.add('hidden');
+            } else {
+                tabPlaylists.className = "pb-3 px-1 text-sm font-semibold border-b-2 border-cyan-400 text-cyan-400 transition-all";
+                tabFavorites.className = "pb-3 px-1 text-sm font-semibold text-zinc-400 border-b-2 border-transparent hover:text-white transition-all";
+                panelPlaylists.classList.remove('hidden');
+                panelFavorites.classList.add('hidden');
+            }
+            renderLibrary();
+        }
+
+        function renderLibrary() {
+            // Favorites Tab
+            const favGrid = document.getElementById('library-favorites-grid');
+            const emptyState = document.getElementById('empty-favorites-state');
+            favGrid.innerHTML = '';
+
+            const favoriteTracks = MUSIC_DATABASE.filter(track => appState.favorites.includes(track.id));
+
+            if (favoriteTracks.length === 0) {
+                emptyState.classList.remove('hidden');
+            } else {
+                emptyState.classList.add('hidden');
+                favoriteTracks.forEach(track => {
+                    const idx = MUSIC_DATABASE.findIndex(t => t.id === track.id);
+                    favGrid.innerHTML += `
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-dark-card border border-dark-border/40">
+                            <div class="flex items-center space-x-3 cursor-pointer" onclick="setTrackToPlayer(${idx})">
+                                <img src="${track.cover}" class="w-12 h-12 rounded-lg object-cover" alt="Art">
+                                <div>
+                                    <h5 class="text-sm font-semibold text-white truncate max-w-[150px]">${track.title}</h5>
+                                    <p class="text-xs text-zinc-400 truncate max-w-[150px]">${track.artist}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="toggleFavorite('${track.id}')" class="text-red-500 p-2"><i class="fas fa-heart"></i></button>
+                                <button onclick="openAddToPlaylistDialog('${track.id}')" class="text-zinc-400 hover:text-white p-2"><i class="fas fa-plus"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            // Playlists Tab
+            const playlistGrid = document.getElementById('library-playlists-grid');
+            playlistGrid.innerHTML = '';
+
+            appState.playlists.forEach(playlist => {
+                playlistGrid.innerHTML += `
+                    <div class="bg-dark-card border border-dark-border/40 p-4 rounded-2xl flex flex-col justify-between h-40 hover:border-cyan-500/20 transition group">
+                        <div>
+                            <div class="flex justify-between items-start">
+                                <div class="w-10 h-10 rounded-xl bg-cyan-950 flex items-center justify-center text-cyan-400"><i class="fas fa-music"></i></div>
+                                <button onclick="deletePlaylist('${playlist.id}')" class="text-zinc-500 hover:text-red-400 transition"><i class="fas fa-trash-alt text-xs"></i></button>
+                            </div>
+                            <h4 class="text-base font-bold text-white mt-3 group-hover:text-cyan-400 transition">${playlist.name}</h4>
+                            <p class="text-xs text-zinc-400 mt-1">${playlist.tracks.length} Lagu tersimpan</p>
+                        </div>
+                        <button onclick="playPlaylist('${playlist.id}')" class="text-xs text-cyan-400 font-bold hover:underline text-left self-start mt-2">Putar Playlist</button>
+                    </div>
+                `;
+            });
+        }
+
+        function openCreatePlaylistDialog() {
+            document.getElementById('playlist-dialog').classList.remove('hidden');
+        }
+
+        function closeCreatePlaylistDialog() {
+            document.getElementById('playlist-dialog').classList.add('hidden');
+            document.getElementById('playlist-name-input').value = '';
+        }
+
+        function submitCreatePlaylist() {
+            const nameInput = document.getElementById('playlist-name-input').value.trim();
+            if (nameInput === '') {
+                showToast("Nama playlist tidak boleh kosong!");
+                return;
+            }
+
+            const newId = 'p_' + Date.now();
+            appState.playlists.push({
+                id: newId,
+                name: nameInput,
+                tracks: []
+            });
+
+            showToast(`Playlist "${nameInput}" berhasil dibuat!`);
+            closeCreatePlaylistDialog();
+            renderLibrary();
+        }
+
+        function deletePlaylist(pId) {
+            appState.playlists = appState.playlists.filter(p => p.id !== pId);
+            showToast("Playlist berhasil dihapus.");
+            renderLibrary();
+        }
+
+        let currentAddTrackId = null;
+        function openAddToPlaylistDialog(trackId) {
+            currentAddTrackId = trackId;
+            const targetList = document.getElementById('target-playlists-list');
+            targetList.innerHTML = '';
+
+            if (appState.playlists.length === 0) {
+                targetList.innerHTML = `<p class="text-xs text-zinc-500">Belum ada playlist kustom. Silahkan buat di tab Playlist.</p>`;
+            } else {
+                appState.playlists.forEach(playlist => {
+                    targetList.innerHTML += `
+                        <button onclick="addTrackToPlaylist('${playlist.id}')" class="w-full text-left p-2 rounded bg-dark-base hover:bg-dark-hover border border-dark-border/40 text-xs font-semibold text-zinc-200 hover:text-white transition flex justify-between items-center">
+                            <span>${playlist.name}</span>
+                            <span class="text-[10px] bg-zinc-800 text-zinc-400 px-2 py-0.5 rounded">${playlist.tracks.length} lagu</span>
+                        </button>
+                    `;
+                });
+            }
+            document.getElementById('add-to-playlist-dialog').classList.remove('hidden');
+        }
+
+        function closeAddToPlaylistDialog() {
+            document.getElementById('add-to-playlist-dialog').classList.add('hidden');
+            currentAddTrackId = null;
+        }
+
+        function addTrackToPlaylist(pId) {
+            const playlist = appState.playlists.find(p => p.id === pId);
+            if (playlist.tracks.includes(currentAddTrackId)) {
+                showToast("Lagu sudah ada di playlist ini!");
+            } else {
+                playlist.tracks.push(currentAddTrackId);
+                showToast(`Lagu ditambahkan ke ${playlist.name}`);
+                closeAddToPlaylistDialog();
+                renderLibrary();
+            }
+        }
+
+        function playPlaylist(pId) {
+            const playlist = appState.playlists.find(p => p.id === pId);
+            if (playlist.tracks.length === 0) {
+                showToast("Playlist kosong. Isi lagu terlebih dahulu!");
+                return;
+            }
+
+            // Set play to first track in playlist
+            const firstTrackId = playlist.tracks[0];
+            const idx = MUSIC_DATABASE.findIndex(t => t.id === firstTrackId);
+            setTrackToPlayer(idx);
+            switchView('player');
+        }
+
+        function toggleFavorite(trackId) {
+            const index = appState.favorites.indexOf(trackId);
+            if (index > -1) {
+                appState.favorites.splice(index, 1);
+                showToast("Dihapus dari koleksi favorit");
+            } else {
+                appState.favorites.push(trackId);
+                showToast("Ditambahkan ke koleksi favorit!");
+            }
+            updateFavoriteButtonUI();
+            renderLibrary();
+            filterSearch(document.getElementById('search-input').value);
+        }
+
+        function toggleFavoriteCurrent() {
+            const currentTrack = MUSIC_DATABASE[appState.currentTrackIndex];
+            toggleFavorite(currentTrack.id);
+        }
+
+        function updateFavoriteButtonUI() {
+            const currentTrack = MUSIC_DATABASE[appState.currentTrackIndex];
+            const isFav = appState.favorites.includes(currentTrack.id);
+            const fullPlayerHeart = document.getElementById('player-favorite-btn').firstElementChild;
+            const miniPlayerHeart = document.getElementById('mini-favorite-btn').firstElementChild;
+
+            if (isFav) {
+                fullPlayerHeart.className = "fas fa-heart text-red-500 text-lg";
+                miniPlayerHeart.className = "fas fa-heart text-red-500";
+            } else {
+                fullPlayerHeart.className = "far fa-heart text-lg";
+                miniPlayerHeart.className = "far fa-heart";
+            }
+        }
+
+        function addToHistory(trackId) {
+            appState.recentlyPlayed = appState.recentlyPlayed.filter(id => id !== trackId);
+            appState.recentlyPlayed.unshift(trackId);
+            if (appState.recentlyPlayed.length > 6) {
+                appState.recentlyPlayed.pop();
+            }
+            renderRecentlyPlayed();
+        }
+
+        function renderRecentlyPlayed() {
+            const grid = document.getElementById('recently-played-grid');
+            grid.innerHTML = '';
+
+            if (appState.recentlyPlayed.length === 0) {
+                grid.innerHTML = `<p class="text-xs text-zinc-500 py-4 col-span-2">Belum ada riwayat pemutaran terbaru.</p>`;
+                return;
+            }
+
+            appState.recentlyPlayed.forEach(trackId => {
+                const track = MUSIC_DATABASE.find(t => t.id === trackId);
+                if (!track) return;
+                const idx = MUSIC_DATABASE.findIndex(t => t.id === trackId);
+                
+                grid.innerHTML += `
+                    <div onclick="setTrackToPlayer(${idx})" class="flex items-center space-x-3 bg-dark-card/60 p-2 rounded-xl border border-dark-border/20 hover:bg-dark-hover transition cursor-pointer">
+                        <img src="${track.cover}" class="w-10 h-10 rounded-lg object-cover" alt="Cover">
+                        <div class="overflow-hidden">
+                            <h5 class="text-xs font-semibold text-white truncate">${track.title}</h5>
+                            <p class="text-[10px] text-zinc-400 truncate">${track.artist}</p>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function clearRecentlyPlayed() {
+            appState.recentlyPlayed = [];
+            renderRecentlyPlayed();
+            showToast("Riwayat pemutaran berhasil dihapus.");
+        }
+
+        function renderLyrics(lyricsArray) {
+            const container = document.getElementById('lyrics-container');
+            container.innerHTML = '';
+            
+            if (!lyricsArray || lyricsArray.length === 0) {
+                container.innerHTML = `<p class="text-zinc-500 text-sm">Lirik tidak tersedia untuk lagu ini.</p>`;
+                return;
+            }
+
+            lyricsArray.forEach((lyric, idx) => {
+                container.innerHTML += `
+                    <p id="lyric-line-${idx}" data-time="${lyric.time}" class="lyric-line text-base text-zinc-500 font-semibold transition-all duration-300 py-1">
+                        ${lyric.text}
+                    </p>
+                `;
+            });
+        }
+
+        function highlightLyrics(currentTime) {
+            const lines = document.querySelectorAll('.lyric-line');
+            let activeIdx = -1;
+
+            lines.forEach((line, idx) => {
+                const time = parseFloat(line.getAttribute('data-time'));
+                if (currentTime >= time) {
+                    activeIdx = idx;
+                }
+            });
+
+            lines.forEach((line, idx) => {
+                if (idx === activeIdx) {
+                    line.className = "lyric-line text-lg text-cyan-400 font-bold py-1 scale-105 duration-200";
+                    // Dynamic scroll inside lyrics widget
+                    const container = document.getElementById('lyrics-container');
+                    const offset = line.offsetTop - container.offsetTop - (container.clientHeight / 2);
+                    container.scrollTop = offset;
+                } else {
+                    line.className = "lyric-line text-sm text-zinc-500 font-semibold py-1";
+                }
+            });
+        }
+
+        function togglePlayerWidget(mode) {
+            const visWidget = document.getElementById('player-visualizer-widget');
+            const lyrWidget = document.getElementById('player-lyrics-widget');
+            const visBtn = document.getElementById('widget-btn-visualizer');
+            const lyrBtn = document.getElementById('widget-btn-lyrics');
+
+            if (mode === 'visualizer') {
+                visWidget.classList.remove('hidden');
+                lyrWidget.classList.add('hidden');
+                visBtn.className = "px-4 py-1.5 rounded-full bg-cyan-500 text-dark-base font-bold transition";
+                lyrBtn.className = "px-4 py-1.5 rounded-full text-zinc-400 hover:text-white transition";
+                setTimeout(resizeVisualizerCanvas, 50);
+            } else {
+                lyrWidget.classList.remove('hidden');
+                visWidget.classList.add('hidden');
+                lyrBtn.className = "px-4 py-1.5 rounded-full bg-cyan-500 text-dark-base font-bold transition";
+                visBtn.className = "px-4 py-1.5 rounded-full text-zinc-400 hover:text-white transition";
+            }
+        }
+
+        function toggleEqualizerModal() {
+            const modal = document.getElementById('equalizer-modal');
+            modal.classList.toggle('hidden');
+        }
+
+        function applyEQPreset(preset) {
+            if (!appState.audioCtxCreated) initWebAudioAPI();
+
+            // Deselect previous preset buttons active state
+            document.querySelectorAll('.eq-preset-btn').forEach(btn => {
+                btn.className = "eq-preset-btn px-3 py-2 text-xs font-semibold rounded-xl bg-dark-base text-zinc-300 border border-dark-border transition";
+            });
+
+            // Find event target or match manually
+            let activeBtnText = "";
+            if (preset === 'normal') {
+                equalizerFilter.gain.value = 0;
+                bassBoostFilter.gain.value = 0;
+                document.getElementById('bass-boost-slider').value = 0;
+                document.getElementById('bass-val').innerText = '0dB';
+                showToast("EQ Reset ke Flat");
+            } else if (preset === 'bass') {
+                equalizerFilter.gain.value = 2;
+                bassBoostFilter.gain.value = 10;
+                document.getElementById('bass-boost-slider').value = 10;
+                document.getElementById('bass-val').innerText = '10dB';
+                showToast("Preset Bass Booster diterapkan");
+            } else if (preset === 'vocal') {
+                equalizerFilter.gain.value = 8;
+                bassBoostFilter.gain.value = -2;
+                document.getElementById('bass-boost-slider').value = 0;
+                document.getElementById('bass-val').innerText = '0dB';
+                showToast("Preset Vokal Jernih diterapkan");
+            } else if (preset === 'chill') {
+                equalizerFilter.gain.value = -3;
+                bassBoostFilter.gain.value = 5;
+                document.getElementById('bass-boost-slider').value = 5;
+                document.getElementById('bass-val').innerText = '5dB';
+                showToast("Preset Chill Lofi diterapkan");
+            }
+        }
+
+        function adjustBass(value) {
+            if (!appState.audioCtxCreated) initWebAudioAPI();
+            bassBoostFilter.gain.value = value;
+            document.getElementById('bass-val').innerText = `${value}dB`;
+        }
+
+        function adjustReverb(value) {
+            const valLabel = document.getElementById('reverb-val');
+            if (parseFloat(value) === 0) {
+                valLabel.innerText = "Mati";
+            } else if (parseFloat(value) <= 0.4) {
+                valLabel.innerText = "Ruang Sedang";
+            } else {
+                valLabel.innerText = "Gedung Konser";
+            }
+        }
+
+        function toggleSleepTimerModal() {
+            document.getElementById('sleep-timer-modal').classList.toggle('hidden');
+        }
+
+        function setSleepTimer(minutes) {
+            if (sleepTimerId) {
+                clearTimeout(sleepTimerId);
+                sleepTimerId = null;
+            }
+
+            const display = document.getElementById('sleep-timer-display');
+            if (minutes === 0) {
+                display.innerText = "Waktu Tidur";
+                showToast("Timer tidur dinonaktifkan");
+            } else {
+                sleepTimerMinutesRemaining = minutes;
+                display.innerText = `${minutes}m`;
+                showToast(`Audio mati otomatis dalam ${minutes} menit`);
+                
+                sleepTimerId = setInterval(() => {
+                    sleepTimerMinutesRemaining--;
+                    if (sleepTimerMinutesRemaining <= 0) {
+                        audioElement.pause();
+                        appState.isPlaying = false;
+                        updatePlayStates(false);
+                        display.innerText = "Waktu Tidur";
+                        showToast("Audio dihentikan oleh Timer Tidur.");
+                        clearInterval(sleepTimerId);
+                        sleepTimerId = null;
+                    } else {
+                        display.innerText = `${sleepTimerMinutesRemaining}m`;
+                    }
+                }, 60000);
+            }
+            toggleSleepTimerModal();
+        }
+
+        function adjustVolume(val) {
+            audioElement.volume = val;
+            appState.volume = val;
+            const icon = document.getElementById('volume-icon');
+            if (parseFloat(val) === 0) {
+                icon.innerHTML = '<i class="fas fa-volume-mute"></i>';
+            } else if (parseFloat(val) < 0.5) {
+                icon.innerHTML = '<i class="fas fa-volume-down"></i>';
+            } else {
+                icon.innerHTML = '<i class="fas fa-volume-up"></i>';
+            }
+        }
+
+        function toggleMute() {
+            appState.isMuted = !appState.isMuted;
+            const volumeSlider = document.getElementById('volume-slider');
+            if (appState.isMuted) {
+                audioElement.volume = 0;
+                volumeSlider.value = 0;
+                document.getElementById('volume-icon').innerHTML = '<i class="fas fa-volume-mute"></i>';
+            } else {
+                audioElement.volume = appState.volume;
+                volumeSlider.value = appState.volume;
+                adjustVolume(appState.volume);
+            }
+        }
+
+        function playRandomTrack() {
+            const randIndex = Math.floor(Math.random() * MUSIC_DATABASE.length);
+            setTrackToPlayer(randIndex);
+            switchView('player');
+            showToast(`Memutar acak: ${MUSIC_DATABASE[randIndex].title}`);
+        }
+
+        function shareSong() {
+            const track = MUSIC_DATABASE[appState.currentTrackIndex];
+            // Safe simulated clipboard copy for standard browser compatibility inside iFrames
+            const textToCopy = `Harmoni Music - Sedang mendengarkan "${track.title}" oleh ${track.artist}`;
+            
+            const dummyInput = document.createElement("input");
+            document.body.appendChild(dummyInput);
+            dummyInput.value = textToCopy;
+            dummyInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummyInput);
+            
+            showToast("Teks tautan disalin ke papan klip!");
+        }
+
+        function formatTime(seconds) {
+            if (isNaN(seconds)) return "0:00";
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            const text = document.getElementById('toast-text');
+            
+            text.innerText = message;
+            toast.classList.remove('opacity-0', '-translate-y-10', 'pointer-events-none');
+            toast.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', '-translate-y-10', 'pointer-events-none');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
